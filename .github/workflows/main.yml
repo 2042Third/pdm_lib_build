@@ -107,16 +107,32 @@ jobs:
         if: ${{ matrix.platform == 'windows-latest' }}
         run: Compress-Archive -Path ./ci -DestinationPath ${{ github.workspace }}/Archive.zip
           
-      - name: Windows Copy file via SSH
+      # - name: Windows Copy file via SSH
+      #   if: ${{ matrix.platform == 'windows-latest' }}
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     source: ${{ github.workspace }}/Archive.zip
+      #     target: "/home/${{ secrets.SSH_USER }}/frameless/build/${{ matrix.platform }}/${{ matrix.library-type }}/"
+      - name: Windows Install SSH client
         if: ${{ matrix.platform == 'windows-latest' }}
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ${{ github.workspace }}/Archive.zip
-          target: "/home/${{ secrets.SSH_USER }}/frameless/build/${{ matrix.platform }}/${{ matrix.library-type }}/"
-          
+        run: |
+          Add-WindowsFeature -Name OpenSSH.Client -IncludeAllSubFeature -IncludeManagementTools
+          ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name:  Windows Copy file via SSH
+        if: ${{ matrix.platform == 'windows-latest' }}
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | Out-File -Encoding ascii -FilePath ~/.ssh/id_rsa
+          (Get-Content -path ~/.ssh/id_rsa) | Set-Content -Path ~/.ssh/id_rsa -Encoding ascii
+          Set-ItemProperty -path ~/.ssh/id_rsa -name Attributes -value 'ReadOnly'
+          scp ./Archive.zip $SSH_USER@$SSH_HOST:"/home/$SSH_USER/frameless/build/${{ matrix.platform }}/${{ matrix.library-type }}/"
       - name: MacOS Compress Folder
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
