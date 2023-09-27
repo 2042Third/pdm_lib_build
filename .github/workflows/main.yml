@@ -1,0 +1,29 @@
+name: Build and Upload
+
+on:
+  push:
+    branches:
+      - main # Trigger the workflow on push to the main branch of your workflow repository.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Run the job on an Ubuntu runner.
+
+    steps:
+    - name: Checkout target repository
+      uses: actions/checkout@v2
+      with:
+        repository: user/target-repo # Replace with the actual owner and repository name.
+
+    - name: Build the project
+      run: |
+        # Add commands to build the project.
+        # This will depend on the build system used by the target repository.
+
+    - name: Upload to server
+      run: |
+        # Add commands to upload the build artifacts to your server.
+        # You might use scp, rsync, or another method depending on your server.
+        scp -r ./build user@server:/path/to/destination
+      env:
+        PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
