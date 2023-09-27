@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         qt-version: [ 6.5.1]
-        library-type: [shared, static]
+        library-type: [static]
         platform: [windows-latest, ubuntu-latest, macos-latest]
         include:
           - platform: windows-latest
