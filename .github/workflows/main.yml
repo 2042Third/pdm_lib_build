@@ -50,9 +50,6 @@ jobs:
         with:
           repository: wangwenx190/framelesshelper
           submodules: recursive
-          
-      - name: Go into frameless helper
-        run: cd framelesshelper
 
       - name: Install Qt SDK
         uses: jurplel/install-qt-action@v3
