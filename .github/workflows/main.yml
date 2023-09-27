@@ -20,7 +20,8 @@ jobs:
       matrix:
         qt-version: [ 6.5.1]
         library-type: [ shared, static]
-        platform: [windows-latest, ubuntu-latest, macos-latest]
+        # platform: [windows-latest, ubuntu-latest, macos-latest]
+        platform: [ macos-latest]
         include:
           - platform: windows-latest
             CC: cl
@@ -86,7 +87,20 @@ jobs:
           cmake --build . --target all --config Release --parallel
           cmake --install . --config Release --strip
 
+      - name: Rsync to Server (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          echo "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > private_key
+          chmod 600 private_key
+          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" ./ci/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/frameless/build/${{matrix.platform}}/${{ matrix.library-type }}/
+      - name: SCP to Server (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          echo "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > private_key
+          chmod 600 private_key
+          rsync  -rtv --delete  "ssh -i private_key -o StrictHostKeyChecking=no" ./ci/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/frameless/build/${{matrix.platform}}/${{ matrix.library-type }}/
       - name: rsync deployments
+        if: matrix.platform == 'ubuntu-latest'
         uses: burnett01/rsync-deployments@5.2
         with:
           switches: -rtv --delete 
