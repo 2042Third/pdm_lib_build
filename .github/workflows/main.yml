@@ -20,8 +20,7 @@ jobs:
       matrix:
         qt-version: [ 6.5.1]
         library-type: [ shared, static]
-        # platform: [windows-latest, ubuntu-latest, macos-latest]
-        platform: [ macos-latest]
+        platform: [windows-latest, ubuntu-latest, macos-latest]
         include:
           - platform: windows-latest
             CC: cl
@@ -87,25 +86,46 @@ jobs:
           cmake --build . --target all --config Release --parallel
           cmake --install . --config Release --strip
 
-      - name: Rsync to Server (Windows)
-        if: matrix.platform == 'windows-latest'
+      - name: Linux Compress Folder
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-          echo "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > private_key
-          chmod 600 private_key
-          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" ./ci/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/frameless/build/${{matrix.platform}}/${{ matrix.library-type }}/
-      - name: SCP to Server (macOS)
-        if: matrix.platform == 'macos-latest'
+          tar -czvf Archive.tar.gz ./ci
+
+      - name: Linux rsync deployments
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > private_key
-          chmod 600 private_key
-          rsync  -rtv --delete  "ssh -i private_key -o StrictHostKeyChecking=no" ./ci/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/frameless/build/${{matrix.platform}}/${{ matrix.library-type }}/
-      - name: rsync deployments
-        if: matrix.platform == 'ubuntu-latest'
-        uses: burnett01/rsync-deployments@5.2
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null Archive.tar.gz $SSH_USER@$SSH_HOST:/home/$SSH_USER/frameless/build/${{ matrix.platform }}/${{ matrix.library-type }}/
+          rm -f private_key.pem
+          
+      - name: Windows Compress folder
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: Compress-Archive -Path ./ci -DestinationPath ${{ github.workspace }}/Archive.zip
+          
+      - name: Windows Copy file via SSH
+        if: ${{ matrix.platform == 'windows-latest' }}
+        uses: appleboy/scp-action@master
         with:
-          switches: -rtv --delete 
-          path: ./ci/*
-          remote_path: ~/frameless/build/${{matrix.platform}}/${{ matrix.library-type }}/
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ${{ github.workspace }}/Archive.zip
+          target: "/home/${{ secrets.SSH_USER }}/frameless/build/${{ matrix.platform }}/${{ matrix.library-type }}/"
+          
+      - name: MacOS Compress Folder
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+          tar -czvf Archive.tar.gz ./ci  
+      - name: MacOS Copy file via SCP
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          scp -i private_key.pem -o StrictHostKeyChecking=no Archive.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/frameless/build/${{ matrix.platform }}/${{ matrix.library-type }}/
+          rm -f private_key.pem
+          
