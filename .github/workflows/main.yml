@@ -46,7 +46,29 @@ jobs:
     continue-on-error: true
     
     steps:
-    - name: Setup rsync
+    - name: Macos/Linux Setup rsync
+      if: ${{ matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest' }}
       uses: GuillaumeFalourd/setup-rsync@v1.1
-    - name: Test rsync 
+    - name: Macos/Linux Test rsync 
+      if: ${{ matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest' }}
       run: rsync --version
+      
+    - name: Windows Enable WSL
+      if: ${{ matrix.platform == 'windows-latest'}}
+      run: dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+    - name: Windows Install Ubuntu
+      if: ${{ matrix.platform == 'windows-latest'}}
+      run: wsl --install -d Ubuntu
+      shell: powershell
+
+    - name: Windows Update and Install rsync
+      if: ${{ matrix.platform == 'windows-latest'}}
+      run: |
+        wsl sudo apt-get update
+        wsl sudo apt-get install -y rsync
+
+    - name: Windows Run rsync
+      if: ${{ matrix.platform == 'windows-latest'}}
+      run: |
+        wsl rsync --version
