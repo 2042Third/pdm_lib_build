@@ -55,11 +55,13 @@ jobs:
       
     - name: Windows Enable WSL
       if: ${{ matrix.platform == 'windows-latest'}}
-      run: dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+      run: dism.exe /online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart  && ^
+          dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
 
     - name: Windows Install Ubuntu
       if: ${{ matrix.platform == 'windows-latest'}}
-      run: wsl --install -d Ubuntu
+      run: wsl --set-default-version 2 && wsl --install -d Ubuntu
       shell: powershell
 
     - name: Windows Update and Install rsync
