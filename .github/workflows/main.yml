@@ -67,12 +67,13 @@ jobs:
       # - name: Set up MSVC environment
       #   if: ${{ matrix.platform == 'windows-latest' }}
       #   uses: ilammy/msvc-dev-cmd@v1
-      - name: Set up MinGW environment
-        if: ${{ matrix.platform == 'windows-latest' }}
-        uses: brechtsanders/setup-mingw-w64@master
-        with:
-          gcc_version: latest
+      # - name: Set up MinGW environment
+      #   if: ${{ matrix.platform == 'windows-latest' }}
+      #   uses: brechtsanders/setup-mingw-w64@master
+      #   with:
+      #     gcc_version: latest
       - name: Install MinGW
+        if: ${{ matrix.platform == 'windows-latest' }}
         uses: egor-tensin/setup-mingw@v2
         
 
