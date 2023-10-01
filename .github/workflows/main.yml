@@ -96,8 +96,8 @@ jobs:
         if: ${{ matrix.platform == 'windows-latest' }}
         run: | 
           dir D:\a\pdm_lib_build\pdm_lib_build
-          dir D:\a\pdm_lib_build
-          Compress-Archive -Path ${{ github.workspace }}/../install -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
+          cd D:\a\pdm_lib_build
+          Compress-Archive -Path ./pdm_lib_build -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
         
       - name: MacOS Compress Folder
         if: ${{ matrix.platform == 'macos-latest' }}
