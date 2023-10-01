@@ -86,17 +86,6 @@ jobs:
           cmake --build . --target all --config Release --parallel
           cmake --install . --config Release --strip
 
-      - name: Linux Compress Folder
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: |
-          tar -czvf FramelessLibLin.tar.gz ./ci
-      - name: Windows Compress folder
-        if: ${{ matrix.platform == 'windows-latest' }}
-        run: Compress-Archive -Path ./ci -DestinationPath ${{ github.workspace }}/FramelessLibWin.zip
-      - name: MacOS Compress Folder
-        if: ${{ matrix.platform == 'macos-latest' }}
-        run: |
-          tar -czvf FramelessLibMacos.tar.gz ./ci  
           
       - name: Linux Compress Folder
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -112,3 +101,14 @@ jobs:
         run: |
           tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz ./ci  
 
+      - name: Linux Upload to server
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: 'sudo ls -al && curl -X POST -H "Content-Type: multipart/form-data" -F "description=data" -F "file=@FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Linux.tar.gz" https://pdm.pw/uploads/Upload'
+        
+      - name: Macos Upload to server
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: 'sudo ls -al && curl -X POST -H "Content-Type: multipart/form-data" -F "description=data" -F "file=@FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz" https://pdm.pw/uploads/Upload'
+        
+      - name: Windows Upload to server
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: 'dir & curl -X POST -H "Content-Type: multipart/form-data" -F "description=data" -F "file=@${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip" https://pdm.pw/uploads/Upload'
