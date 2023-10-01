@@ -80,28 +80,25 @@ jobs:
 
       - name: Build library with CMake
         run: |
-          mkdir ../build
-          cd ../build
-          cmake -DCMAKE_MESSAGE_LOG_LEVEL=STATUS -DCMAKE_C_COMPILER=${{ matrix.CC }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DCMAKE_LINKER=${{ matrix.LD }} -DCMAKE_INSTALL_PREFIX=./ -DCMAKE_BUILD_TYPE=Release -DFRAMELESSHELPER_BUILD_EXAMPLES=ON -DFRAMELESSHELPER_NO_SUMMARY=OFF ${{ matrix.lib_type_flag }} ${{ matrix.EXTRA_FLAGS }} -GNinja ..
+          mkdir ${{ github.workspace }}/build
+          cd ${{ github.workspace }}/build
+          cmake -DCMAKE_MESSAGE_LOG_LEVEL=STATUS -DCMAKE_C_COMPILER=${{ matrix.CC }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DCMAKE_LINKER=${{ matrix.LD }} -DCMAKE_INSTALL_PREFIX=./ -DCMAKE_BUILD_TYPE=Release -DFRAMELESSHELPER_BUILD_EXAMPLES=ON -DFRAMELESSHELPER_NO_SUMMARY=OFF ${{ matrix.lib_type_flag }} ${{ matrix.EXTRA_FLAGS }} -GNinja ${{ github.workspace }}/framelesshelper
           cmake --build . --target all --config Release --parallel
           cmake --install . --config Release --strip
-
-      - name: Get out folder
-        run: cd ../
           
       - name: Linux Compress Folder
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Linux.tar.gz ./build
+          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Linux.tar.gz ${{ github.workspace }}/build
           
       - name: Windows Compress folder
         if: ${{ matrix.platform == 'windows-latest' }}
-        run: Compress-Archive -Path ./build -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
+        run: Compress-Archive -Path ${{ github.workspace }}/build -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
         
       - name: MacOS Compress Folder
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
-          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz ./build  
+          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz ${{ github.workspace }}/build 
 
       - name: Linux Upload to server
         if: ${{ matrix.platform == 'ubuntu-latest' }}
