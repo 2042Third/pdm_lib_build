@@ -51,7 +51,9 @@ jobs:
         with:
           repository: wangwenx190/framelesshelper
           submodules: recursive
-
+      - name: List contents after checkout
+        run: ls -al /home/runner/work/pdm_lib_build
+        
       - name: Install Qt SDK
         uses: jurplel/install-qt-action@v3
         with:
