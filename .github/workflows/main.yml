@@ -53,8 +53,6 @@ jobs:
           path: framelesshelper
           submodules: recursive
           
-      - name: List directories
-        run: ls -al /home/runner/work/pdm_lib_build/pdm_lib_build
 
       - name: Install Qt SDK
         uses: jurplel/install-qt-action@v3
