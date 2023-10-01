@@ -50,7 +50,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: wangwenx190/framelesshelper
-          path: framelesshelper
           submodules: recursive
           
 
