@@ -120,7 +120,7 @@ jobs:
           
       - name: Windows Compress folder
         if: ${{ matrix.platform == 'windows-latest' }}
-        run: Compress-Archive -Path ../install -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
+        run: Compress-Archive -Path ${{ github.workspace }}/../install -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
         
       - name: MacOS Compress Folder
         if: ${{ matrix.platform == 'macos-latest' }}
