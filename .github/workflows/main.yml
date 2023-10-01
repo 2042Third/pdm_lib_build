@@ -72,6 +72,9 @@ jobs:
         uses: brechtsanders/setup-mingw-w64@master
         with:
           gcc_version: latest
+      - name: Install MinGW
+        uses: egor-tensin/setup-mingw@v2
+        
 
       - name: Install Linux dependencies
         if: ${{ matrix.platform == 'ubuntu-latest' }}
