@@ -98,31 +98,17 @@ jobs:
         run: |
           tar -czvf FramelessLibMacos.tar.gz ./ci  
           
-      - name: Linux Upload to server
+      - name: Linux Compress Folder
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: 'sudo ls -al && curl -X POST -H "Content-Type: multipart/form-data" -F "description=data" -F "file=@FramelessLibLin.tar.gz" https://pdm.pw/uploads/Upload'
-        
-      - name: Macos Upload to server
-        if: ${{ matrix.platform == 'macos-latest' }}
-        run: 'sudo ls -al && curl -X POST -H "Content-Type: multipart/form-data" -F "description=data" -F "file=@FramelessLibMacos.tar.gz" https://pdm.pw/uploads/Upload'
-        
-      - name: Windows Upload to server
+        run: |
+          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Linux.tar.gz ./ci
+          
+      - name: Windows Compress folder
         if: ${{ matrix.platform == 'windows-latest' }}
-        run: 'dir & curl -X POST -H "Content-Type: multipart/form-data" -F "description=data" -F "file=@${{ github.workspace }}/FramelessLibWin.zip" https://pdm.pw/uploads/Upload'
-
-
-
-
-
-
-
-
+        run: Compress-Archive -Path ./ci -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
         
-      # - name: Macos/Linux Setup rsync
-      #   if: ${{ matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest' }}
-      #   uses: GuillaumeFalourd/setup-rsync@v1.1
-      # - name: Macos/Linux Test rsync 
-      #   if: ${{ matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest' }}
-      #   run: rsync --version
-      
+      - name: MacOS Compress Folder
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz ./ci  
 
