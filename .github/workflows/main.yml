@@ -100,13 +100,13 @@ jobs:
           
       - name: Linux Upload to server
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: curl -X POST -F "file=@FramelessLibLin.tar.gz" https://pdm.pw/uploads/Upload
+        run: sudo ls -al && curl -X POST -F "file=@FramelessLibLin.tar.gz" https://pdm.pw/uploads/Upload
       - name: Macos Upload to server
         if: ${{ matrix.platform == 'macos-latest' }}
-        run: curl -X POST -F "file=@FramelessLibMacos.tar.gz" https://pdm.pw/uploads/Upload
+        run: sudo ls -al && curl -X POST -F "file=@FramelessLibMacos.tar.gz" https://pdm.pw/uploads/Upload
       - name: Windows Upload to server
         if: ${{ matrix.platform == 'windows-latest' }}
-        run: curl -X POST -F "file=@${{ github.workspace }}/FramelessLibWin.zip" https://pdm.pw/uploads/Upload
+        run:   dir &  curl -X POST -F "file=@${{ github.workspace }}/FramelessLibWin.zip" https://pdm.pw/uploads/Upload
 
 
 
