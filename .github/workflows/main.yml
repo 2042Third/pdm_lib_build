@@ -26,7 +26,7 @@ jobs:
             CC: gcc
             CXX: g++
             LD: ld
-            EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_SPECTRE=ON -DFRAMELESSHELPER_ENABLE_EHCONTGUARD=ON -DFRAMELESSHELPER_ENABLE_INTELCET=ON -DFRAMELESSHELPER_ENABLE_CFGUARD=ON
+            EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_SPECTRE=ON -DVK_PROTOTYPES -DFRAMELESSHELPER_ENABLE_EHCONTGUARD=ON -DFRAMELESSHELPER_ENABLE_INTELCET=ON -DFRAMELESSHELPER_ENABLE_CFGUARD=ON
           - platform: ubuntu-latest
             CC: gcc
             CXX: g++
@@ -106,7 +106,7 @@ jobs:
         run: |
           mkdir ci
           cd ci
-          cmake -DCMAKE_MESSAGE_LOG_LEVEL=STATUS -DCMAKE_C_COMPILER=${{ matrix.CC }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DCMAKE_LINKER=${{ matrix.LD }} -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release -DFRAMELESSHELPER_BUILD_EXAMPLES=ON -DFRAMELESSHELPER_NO_SUMMARY=OFF ${{ matrix.lib_type_flag }} ${{ matrix.EXTRA_FLAGS }} -GNinja ..
+          cmake -DCMAKE_MESSAGE_LOG_LEVEL=STATUS -DCMAKE_CXX_STANDARD=17 -DCMAKE_C_COMPILER=${{ matrix.CC }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DCMAKE_LINKER=${{ matrix.LD }} -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release -DFRAMELESSHELPER_BUILD_EXAMPLES=ON -DFRAMELESSHELPER_NO_SUMMARY=OFF ${{ matrix.lib_type_flag }} ${{ matrix.EXTRA_FLAGS }} -GNinja ..
           cmake --build . --target all --config Release --parallel
           cmake --install . --config Release --strip
           
