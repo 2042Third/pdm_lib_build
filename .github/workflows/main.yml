@@ -54,11 +54,24 @@ jobs:
           
 
       - name: Install Qt SDK
+        if: ${{ matrix.platform == 'macos-latest' || matrix.platform == 'ubuntu-latest'  }}
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt-version }}
           cache: true
-
+          
+      - name: Install Qt
+        if: ${{ matrix.platform == 'windows-latest' }}
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.5.1'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw'
+          tools: 'tools_mingw,qt.tools.win32_mingw482'
+          cache: true
+          
       - name: Set up Ninja
         uses: seanmiddleditch/gha-setup-ninja@v3
         with:
