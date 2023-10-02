@@ -49,18 +49,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          repository: wangwenx190/framelesshelper
           submodules: recursive
           
 
-      - name: Install Qt SDK
+      - name: Linux and MacOS install Qt SDK
         if: ${{ matrix.platform == 'macos-latest' || matrix.platform == 'ubuntu-latest'  }}
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt-version }}
           cache: true
-          
-      - name: Install Qt
+
+      - name: Windows install Qt and compiler
+        if: ${{matrix.platform == 'windows-latest'}}
         uses: jurplel/install-qt-action@v3
         with:
           aqtversion: '==3.1.*'
@@ -70,40 +70,36 @@ jobs:
           arch: 'win64_mingw'
           tools: 'tools_mingw90'
           cache: true
+      
           
       - name: Set up Ninja
         uses: seanmiddleditch/gha-setup-ninja@v3
         with:
           version: 1.11.1 # Current latest version.
 
-      # - name: Set up MSVC environment
-      #   if: ${{ matrix.platform == 'windows-latest' }}
-      #   uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Check g++ compiler
-        if: ${{ matrix.platform == 'windows-latest' }}
-        run: g++ --version
-      - name: Check qt installation 
-        if: ${{matrix.platform == 'windows-latest'}}
-        run: dir D:/a/pdm_lib_build/Qt/6.5.2/
-        
       - name: Install Linux dependencies
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
 
-      - name: Check g++ compiler
-        if: ${{ matrix.platform == 'windows-latest' }}
-        run: g++ --version
-        
       - name: Install macOS dependencies
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
           brew install llvm
           export PATH="/usr/local/opt/llvm/bin:$PATH"
 
+      - name: Show g++ compiler
+        run: g++ --version
+
+      - name: Check compiler and linker paths
+        run: |
+          which ${{ matrix.CXX }}
+          which ${{ matrix.CC }}
+          which ${{ matrix.LD }}
+
       - name: Build library with CMake
         run: |
+          cd framelesshelper-2.4.2
           mkdir ci
           cd ci
           cmake -DCMAKE_MESSAGE_LOG_LEVEL=STATUS -DCMAKE_CXX_STANDARD=17 -DCMAKE_C_COMPILER=${{ matrix.CC }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DCMAKE_LINKER=${{ matrix.LD }} -DCMAKE_INSTALL_PREFIX=./ -DCMAKE_BUILD_TYPE=Release -DFRAMELESSHELPER_BUILD_EXAMPLES=ON -DFRAMELESSHELPER_NO_SUMMARY=OFF ${{ matrix.lib_type_flag }} ${{ matrix.EXTRA_FLAGS }} -GNinja ..
@@ -118,7 +114,7 @@ jobs:
           
       - name: Windows Compress folder
         if: ${{ matrix.platform == 'windows-latest' }}
-        run: | 
+        run: |
           dir D:\a\pdm_lib_build\pdm_lib_build
           cd D:\a\pdm_lib_build
           dir /b /s /a-d > pdmLibraryBuildFileList.txt
