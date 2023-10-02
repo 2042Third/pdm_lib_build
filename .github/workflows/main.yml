@@ -85,7 +85,7 @@ jobs:
         run: g++ --version
       - name: Check qt installation 
         if: ${{matrix.platform == 'windows-latest'}}
-        run: dir D:/a/pdm_lib_build/Qt/6.5.1/
+        run: dir D:/a/pdm_lib_build/Qt/6.5.2/
         
       - name: Install Linux dependencies
         if: ${{ matrix.platform == 'ubuntu-latest' }}
