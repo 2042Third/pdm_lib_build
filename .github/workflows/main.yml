@@ -18,7 +18,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        qt-version: [ 6.5.1]
+        qt-version: [ 6.5.2]
         library-type: [ shared, static]
         platform: [windows-latest, ubuntu-latest, macos-latest]
         include:
@@ -61,15 +61,14 @@ jobs:
           cache: true
           
       - name: Install Qt
-        if: ${{ matrix.platform == 'windows-latest' }}
         uses: jurplel/install-qt-action@v3
         with:
           aqtversion: '==3.1.*'
-          version: '6.5.1'
+          version: '6.5.2'
           host: 'windows'
           target: 'desktop'
           arch: 'win64_mingw'
-          tools: 'tools_mingw,qt.tools.win32_mingw482'
+          tools: 'tools_mingw,qt.tools.win64_mingw810'
           cache: true
           
       - name: Set up Ninja
