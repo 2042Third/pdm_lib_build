@@ -31,12 +31,12 @@ jobs:
             CC: gcc
             CXX: g++
             LD: ld
-            EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_SPECTRE=ON -DFRAMELESSHELPER_ENABLE_INTELCET=ON -DFRAMELESSHELPER_ENABLE_CFGUARD=ON
+            # EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_SPECTRE=ON -DFRAMELESSHELPER_ENABLE_INTELCET=ON -DFRAMELESSHELPER_ENABLE_CFGUARD=ON
           - platform: macos-latest
             CC: /usr/local/opt/llvm/bin/clang
             CXX: /usr/local/opt/llvm/bin/clang++
             LD: /usr/local/opt/llvm/bin/ld64.lld
-            EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD=OFF
+            # EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD=OFF
           - library-type: shared
             lib_type_flag: -DFRAMELESSHELPER_BUILD_STATIC=OFF
           - library-type: static
@@ -104,7 +104,7 @@ jobs:
           cd ci
           cmake -DCMAKE_MESSAGE_LOG_LEVEL=STATUS -DCMAKE_CXX_STANDARD=17 -DCMAKE_C_COMPILER=${{ matrix.CC }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DCMAKE_LINKER=${{ matrix.LD }} -DCMAKE_INSTALL_PREFIX=./ -DCMAKE_BUILD_TYPE=Release -DFRAMELESSHELPER_BUILD_EXAMPLES=ON -DFRAMELESSHELPER_NO_SUMMARY=OFF ${{ matrix.lib_type_flag }} ${{ matrix.EXTRA_FLAGS }} -GNinja ..
           cmake --build . --target all --config Release --parallel
-          cmake --install . --config Release --strip
+          cmake --install . --config Release 
           
       - name: Linux Compress Folder
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -117,14 +117,14 @@ jobs:
         run: |
           dir D:\a\pdm_lib_build\pdm_lib_build
           cd D:\a\pdm_lib_build
-          dir /b /s /a-d > pdmLibraryBuildFileList.txt
+          Get-ChildItem -Recurse -File | ForEach-Object { $_.FullName } > pdmLibraryBuildFileList.txt
           Compress-Archive -Path ./pdm_lib_build -DestinationPath ${{ github.workspace }}/FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-Windows.zip
         
       - name: MacOS Compress Folder
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
           find . -type f > pdmLibraryBuildFileList.txt
-          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz /home/runner/work/pdm_lib_build/pdm_lib_build
+          tar -czvf FramelessLib-${{ matrix.qt-version }}-${{ matrix.library-type }}-MacOS.tar.gz /Users/runner/work/pdm_lib_build/pdm_lib_build
 
       - name: Linux Upload to server
         if: ${{ matrix.platform == 'ubuntu-latest' }}
