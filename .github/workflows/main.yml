@@ -36,7 +36,7 @@ jobs:
             CC: /usr/local/opt/llvm/bin/clang
             CXX: /usr/local/opt/llvm/bin/clang++
             LD: /usr/local/opt/llvm/bin/ld64.lld
-            # EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD=OFF
+            EXTRA_FLAGS: -DFRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD=OFF
           - library-type: shared
             lib_type_flag: -DFRAMELESSHELPER_BUILD_STATIC=OFF
           - library-type: static
